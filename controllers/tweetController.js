@@ -121,6 +121,25 @@ const tweetController = {
       })
     }
   },
+
+  addLike: async (req, res) => {
+    try {
+      await Like.create({
+        UserId: req.user.id,
+        TweetId: req.params.id
+      })
+      return res.json({
+        status: 'success',
+        message: 'addLike successfully'
+      })
+    } catch (err) {
+      console.log(err)
+      return res.json({
+        status: 'error',
+        message: err.message || err
+      })
+    }
+  },
 }
 
 module.exports = tweetController
