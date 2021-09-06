@@ -9,6 +9,9 @@ const port = process.env.port || 3000
 
 app.use(methodOverride('_method'))
 
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
 module.exports = app
