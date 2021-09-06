@@ -1,4 +1,5 @@
 const tweetController = require('../controllers/tweetController')
+const followshipController = require('../controllers/followshipController')
 const userController = require('../controllers/userController')
 
 const multer = require('multer')
@@ -17,6 +18,8 @@ module.exports = (app) => {
   app.delete('/tweets/:id', authenticated, tweetController.deleteTweet)
   app.post('/tweets/:id/like', authenticated, tweetController.addLike)
   app.delete('/tweets/:id/like', authenticated, tweetController.deleteLike)
+
+  app.post('/followships', authenticated, followshipController.postFollowship)
   app.get('/users/:id', authenticated, userController.getUser)
   app.put('/users/:id', authenticated, upload.single('avatar'), userController.putUser)
   app.get('/users/:id/tweets', authenticated, userController.getTweets)
