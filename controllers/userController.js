@@ -2,6 +2,8 @@ const db = require('../models')
 const User = db.User
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const imgur = require('imgur-node-api')
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
 const userController = {
   signIn: async (req, res) => {
@@ -104,6 +106,45 @@ const userController = {
     }
   },
 
+  putUser: async (req, res) => {
+    try {
+      if (Number(req.user.id) !== Number(req.params.id)) {
+        throw ('權限不足，無法更新個人資料')
+      }
+      const { file } = req
+      if (file) {
+        imgur.setClientID(IMGUR_CLIENT_ID)
+        imgur.upload(file.path, async (err, img) => {
+          let user = await User.scope('withoutPassword').findByPk(req.params.id)
+          await user.update({
+            name: req.body.name,
+            introduction: req.body.introduction,
+            avatar: img.data.link
+          })
+          return res.json({
+            status: 'success',
+            message: '成功編輯個人資料'
+          })
+        })
+      } else {
+        let user = await User.scope('withoutPassword').findByPk(req.params.id)
+        await user.update({
+          name: req.body.name,
+          introduction: req.body.introduction
+        })
+        return res.json({
+          status: 'success',
+          message: '成功編輯個人資料'
+        })
+      }
+    } catch (err) {
+      console.log(err)
+      return res.json({
+        status: 'error',
+        message: err.message || err
+      })
+    }
+  },
   getCurrentUser: async (req, res) => {
     try {
       return res.json({
