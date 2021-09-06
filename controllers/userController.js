@@ -78,6 +78,31 @@ const userController = {
       })
     }
   },
+
+  getUser: async (req, res) => {
+    try {
+      let user = await User.scope('withoutPassword').findByPk(req.params.id, {
+        include: [
+          // Tweet,
+          // Reply,
+          { model: User, as: 'Followings' },
+          { model: User, as: 'Followers' },
+          // { model: Tweet, as: 'LikedTweets' },
+        ]
+      })
+      if (!user) {
+        throw new Error('查詢無該用戶')
+      }
+      user = user.dataValues
+      return res.json(user)
+    } catch (err) {
+      console.log(err)
+      return res.json({
+        status: 'error',
+        message: err.message || err
+      })
+    }
+  },
 }
 
 module.exports = userController
