@@ -120,6 +120,26 @@ const userController = {
       })
     }
   },
+
+  getCurrentUserFollowings: async (req, res) => {
+    try {
+      let [followings] = await User.scope('withoutPassword').findAll({
+        where: {
+          id: req.user.id
+        },
+        include: [
+          { model: User, as: 'Followings' }
+        ]
+      })
+      return res.json(followings)
+    } catch (err) {
+      console.log(err)
+      return res.json({
+        status: 'error',
+        message: err.message || err
+      })
+    }
+  },
 }
 
 module.exports = userController
