@@ -12,7 +12,25 @@ module.exports = (sequelize, DataTypes) => {
     avatar: DataTypes.STRING,
     introduction: DataTypes.TEXT,
     role: DataTypes.STRING
-  }, {});
+  }, {
+    scopes: {
+      withoutPassword: {
+        attributes: { exclude: ['password'] },
+      }
+    },
+
+    // 預設排除 password 屬性，但會導致登入功能失效(無法使用 password 屬性)
+    // defaultScope: {
+    //   attributes: { exclude: ['password'] },
+    // },
+  });
+
+  User.prototype.toJSON = function () {
+    var values = Object.assign({}, this.get());
+    delete values.password;
+    return values;
+  }
+
   User.associate = function (models) {
     User.hasMany(models.Like)
     User.hasMany(models.Reply)
