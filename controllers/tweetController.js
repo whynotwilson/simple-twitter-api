@@ -140,6 +140,33 @@ const tweetController = {
       })
     }
   },
+
+  deleteLike: async (req, res) => {
+    try {
+      const like = await Like.findOne({
+        where: {
+          UserId: req.user.id,
+          TweetId: req.params.id,
+        },
+      });
+
+      if (!like) {
+        throw "Error: This like did not exist, failed to delete like";
+      }
+
+      await like.destroy();
+      return res.json({
+        status: "success",
+        message: "deleteLike successfully",
+      });
+    } catch (err) {
+      console.log(err);
+      return res.json({
+        status: "error",
+        message: err.message || err,
+      });
+    }
+  },
 }
 
 module.exports = tweetController
