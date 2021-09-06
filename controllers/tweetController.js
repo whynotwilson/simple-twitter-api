@@ -98,6 +98,29 @@ const tweetController = {
       })
     }
   },
+
+  deleteTweet: async (req, res) => {
+    try {
+      const tweet = await Tweet.findByPk(req.params.id)
+      if (!tweet) {
+        throw ('Error: This tweet did not exist, failed to delete tweet')
+      }
+      if (Number(req.user.id) !== Number(tweet.dataValues.UserId)) {
+        throw ('權限不足，無法刪除 tweet')
+      }
+      tweet.destroy()
+      return res.json({
+        status: 'success',
+        message: 'delete tweet successfully'
+      })
+    } catch (err) {
+      console.log(err)
+      return res.json({
+        status: 'error',
+        message: err.message || err
+      })
+    }
+  },
 }
 
 module.exports = tweetController

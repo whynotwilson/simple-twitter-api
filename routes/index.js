@@ -14,6 +14,7 @@ module.exports = (app) => {
   app.get('/tweets', authenticated, tweetController.getTweets)
   app.post('/tweets', authenticated, tweetController.postTweet)
   app.put('/tweets/:id', authenticated, tweetController.putTweet)
+  app.delete('/tweets/:id', authenticated, tweetController.deleteTweet)
   app.get('/users/:id', authenticated, userController.getUser)
   app.put('/users/:id', authenticated, upload.single('avatar'), userController.putUser)
   app.get('/users/:id/tweets', authenticated, userController.getTweets)
