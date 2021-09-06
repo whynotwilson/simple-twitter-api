@@ -67,6 +67,37 @@ const tweetController = {
       })
     }
   },
+
+  putTweet: async (req, res) => {
+    try {
+      const tweet = await Tweet.findByPk(req.params.id)
+      if (!tweet) {
+        throw ('tweet id 異常')
+      }
+
+      if (Number(req.user.id) !== Number(tweet.dataValues.UserId)) {
+        throw ('權限不足，無法更新 tweet')
+      }
+      const description = req.body.description.trim()
+      if (!description) {
+        throw ('Error: The content of the tweet description cannot be blank, failed to update tweet')
+      }
+      tweet.update({
+        description: req.body.description
+      })
+      return res.json({
+        status: 'success',
+        message: 'update tweet successfully',
+        tweet: tweet.dataValues
+      })
+    } catch (err) {
+      console.log(err)
+      return res.json({
+        status: 'error',
+        message: err.message || err
+      })
+    }
+  },
 }
 
 module.exports = tweetController
