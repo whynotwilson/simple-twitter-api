@@ -1,4 +1,5 @@
 const tweetController = require('../controllers/tweetController')
+const replyController = require('../controllers/replyController')
 const followshipController = require('../controllers/followshipController')
 const userController = require('../controllers/userController')
 
@@ -18,6 +19,8 @@ module.exports = (app) => {
   app.delete('/tweets/:id', authenticated, tweetController.deleteTweet)
   app.post('/tweets/:id/like', authenticated, tweetController.addLike)
   app.delete('/tweets/:id/like', authenticated, tweetController.deleteLike)
+
+  app.post('/replies', authenticated, replyController.postReply)
 
   app.post('/followships', authenticated, followshipController.postFollowship)
   app.delete('/followships/:followingId', authenticated, followshipController.deleteFollowship)
