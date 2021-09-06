@@ -43,6 +43,41 @@ const userController = {
       })
     }
   },
+
+  signUp: async (req, res) => {
+    try {
+      const { name, email, password, passwordCheck } = req.body
+      if (!name || !email || !password || !passwordCheck) {
+        throw ('請輸入必填欄位')
+      }
+
+      if (password !== passwordCheck) {
+        throw ('兩次輸入密碼不同')
+      }
+
+      const user = await User.scope('withoutPassword').findOne({ where: { email } })
+      if (user) {
+        throw ('信箱重複')
+      }
+
+      await User.create({
+        name,
+        email,
+        password: bcrypt.hashSync(password, bcrypt.genSaltSync(10), null)
+      })
+
+      return res.json({
+        status: 'success',
+        message: '成功註冊帳號'
+      })
+    } catch (err) {
+      console.log(err)
+      return res.json({
+        status: 'error',
+        message: err.message || err
+      })
+    }
+  },
 }
 
 module.exports = userController
