@@ -1,5 +1,7 @@
 const db = require('../models')
 const User = db.User
+const Tweet = db.Tweet
+const Reply = db.Reply
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const imgur = require('imgur-node-api')
@@ -145,6 +147,29 @@ const userController = {
       })
     }
   },
+
+  getTweets: async (req, res) => {
+    try {
+      const tweets = await Tweet.findAll({
+        where: {
+          UserId: req.params.id
+        },
+        include: [
+          { model: Reply, include: [User] },
+          { model: User, as: 'LikedUsers' },
+          User,
+        ],
+      })
+      return res.json(tweets)
+    } catch (err) {
+      console.log(err)
+      return res.json({
+        status: 'error',
+        message: err.message || err
+      })
+    }
+  },
+
   getCurrentUser: async (req, res) => {
     try {
       return res.json({
