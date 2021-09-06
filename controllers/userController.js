@@ -103,6 +103,23 @@ const userController = {
       })
     }
   },
+
+  getCurrentUser: async (req, res) => {
+    try {
+      return res.json({
+        id: req.user.id,
+        name: req.user.name,
+        email: req.user.email,
+        avatar: req.user.avatar,
+      })
+    } catch (err) {
+      console.log(err)
+      return res.json({
+        status: 'error',
+        message: err.message || err
+      })
+    }
+  },
 }
 
 module.exports = userController
