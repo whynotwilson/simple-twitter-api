@@ -55,6 +55,30 @@ const replyController = {
       })
     }
   },
+
+  deleteReply: async (req, res) => {
+    try {
+      const reply = await Reply.findByPk(req.params.id)
+      if (!reply) {
+        throw (`Error: reply id: ${req.params.id} did not exist, failed to delete reply`)
+      }
+
+      if (Number(req.user.id) !== Number(reply.dataValues.UserId)) {
+        throw ('權限不足，無法刪除 reply')
+      }
+      reply.destroy()
+      return res.json({
+        status: 'success',
+        message: 'delete reply successfully'
+      })
+    } catch (err) {
+      console.log(err)
+      return res.json({
+        status: 'error',
+        message: err.message || err
+      })
+    }
+  },
 }
 
 module.exports = replyController

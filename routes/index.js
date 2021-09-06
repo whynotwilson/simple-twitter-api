@@ -22,6 +22,7 @@ module.exports = (app) => {
 
   app.post('/replies', authenticated, replyController.postReply)
   app.put('/replies/:id', authenticated, replyController.putReply)
+  app.delete('/replies/:id', authenticated, replyController.deleteReply)
 
   app.post('/followships', authenticated, followshipController.postFollowship)
   app.delete('/followships/:followingId', authenticated, followshipController.deleteFollowship)
