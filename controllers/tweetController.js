@@ -40,6 +40,33 @@ const tweetController = {
       })
     }
   },
+
+  postTweet: async (req, res) => {
+    try {
+      const tweetText = req.body.tweetText.trim()
+      if (!tweetText) {
+        throw ('Error: The content of the tweet cannot be blank, failed to create tweet')
+      }
+      let tweet = await Tweet.create({
+        UserId: req.user.id,
+        description: tweetText
+      })
+
+      tweet = tweet.dataValues
+
+      return res.json({
+        status: 'success',
+        message: 'create tweet successfully',
+        tweet
+      })
+    } catch (err) {
+      console.log(err)
+      return res.json({
+        status: 'error',
+        message: err.message || err
+      })
+    }
+  },
 }
 
 module.exports = tweetController

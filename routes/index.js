@@ -12,6 +12,7 @@ module.exports = (app) => {
 
   app.get('/', authenticated, (req, res) => res.redirect('/tweets'))
   app.get('/tweets', authenticated, tweetController.getTweets)
+  app.post('/tweets', authenticated, tweetController.postTweet)
   app.get('/users/:id', authenticated, userController.getUser)
   app.put('/users/:id', authenticated, upload.single('avatar'), userController.putUser)
   app.get('/users/:id/tweets', authenticated, userController.getTweets)
