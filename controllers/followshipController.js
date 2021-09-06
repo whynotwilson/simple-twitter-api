@@ -31,6 +31,32 @@ const followshipController = {
       })
     }
   },
+
+  deleteFollowship: async (req, res) => {
+    try {
+      const followship = await Followship.findOne({
+        where: {
+          followerId: req.body.followerId,
+          followingId: req.params.followingId
+        }
+      })
+      if (!followship) {
+        throw ('Error: this followship did not exist, failed to deleteFollowship')
+      }
+      followship.destroy()
+
+      return res.json({
+        status: 'success',
+        message: 'delete followship successfully'
+      })
+    } catch (err) {
+      console.log(err)
+      res.json({
+        status: 'error',
+        message: err.message || err
+      })
+    }
+  }
 }
 
 module.exports = followshipController
