@@ -29,6 +29,32 @@ const replyController = {
       })
     }
   },
+
+  putReply: async (req, res) => {
+    try {
+      const comment = req.body.comment.trim()
+      if (!comment) {
+        throw ('comment 不能空白')
+      }
+
+      const reply = await Reply.findByPk(req.params.id)
+      if (Number(req.user.id) !== Number(reply.dataValues.UserId)) {
+        throw ('權限不足，無法編輯 reply')
+      }
+      await reply.update({ comment })
+
+      return res.json({
+        status: 'success',
+        message: 'update reply successfully'
+      })
+    } catch (err) {
+      console.log(err)
+      return res.json({
+        status: 'error',
+        message: err.message || err
+      })
+    }
+  },
 }
 
 module.exports = replyController

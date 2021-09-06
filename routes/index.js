@@ -21,6 +21,7 @@ module.exports = (app) => {
   app.delete('/tweets/:id/like', authenticated, tweetController.deleteLike)
 
   app.post('/replies', authenticated, replyController.postReply)
+  app.put('/replies/:id', authenticated, replyController.putReply)
 
   app.post('/followships', authenticated, followshipController.postFollowship)
   app.delete('/followships/:followingId', authenticated, followshipController.deleteFollowship)
