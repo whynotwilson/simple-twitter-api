@@ -1,5 +1,5 @@
-const db = require('../models')
-const Followship = db.Followship
+const db = require("../models");
+const Followship = db.Followship;
 
 const followshipController = {
   postFollowship: async (req, res) => {
@@ -16,19 +16,19 @@ const followshipController = {
       });
 
       if (!isNew) {
-        throw ('Error: already Followed, failed to create followship')
+        throw "Error: already Followed, failed to create followship";
       }
 
       return res.json({
-        status: 'success',
-        message: 'create followship successfully'
-      })
+        status: "success",
+        message: "create followship successfully",
+      });
     } catch (err) {
-      console.log(err)
+      console.log(err);
       res.json({
-        status: 'error',
-        message: err.message || err
-      })
+        status: "error",
+        message: err.message || err,
+      });
     }
   },
 
@@ -37,26 +37,26 @@ const followshipController = {
       const followship = await Followship.findOne({
         where: {
           followerId: req.body.followerId,
-          followingId: req.params.followingId
-        }
-      })
+          followingId: req.params.followingId,
+        },
+      });
       if (!followship) {
-        throw ('Error: this followship did not exist, failed to deleteFollowship')
+        throw "Error: this followship did not exist, failed to deleteFollowship";
       }
-      followship.destroy()
+      followship.destroy();
 
       return res.json({
-        status: 'success',
-        message: 'delete followship successfully'
-      })
+        status: "success",
+        message: "delete followship successfully",
+      });
     } catch (err) {
-      console.log(err)
+      console.log(err);
       res.json({
-        status: 'error',
-        message: err.message || err
-      })
+        status: "error",
+        message: err.message || err,
+      });
     }
-  }
-}
+  },
+};
 
-module.exports = followshipController
+module.exports = followshipController;
