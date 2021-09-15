@@ -6,7 +6,7 @@ const userController = require("../controllers/userController");
 const multer = require("multer");
 const upload = multer({ dest: "temp/" });
 
-const authenticated = require("../middleware/authenticated");
+const { authenticated } = require("../middleware");
 
 module.exports = (app) => {
   app.get("/get_current_user", authenticated, userController.getCurrentUser);
