@@ -1,17 +1,30 @@
 const db = require("../models");
 const Followship = db.Followship;
+const User = db.User;
 
 const followshipController = {
   postFollowship: async (req, res) => {
     try {
+      const followerId = Number(req.user.id);
+      const followingId = Number(req.body.followingId);
+
+      if (followerId === followingId) {
+        throw "Error: can not follow self, failed to create followship";
+      }
+
+      const user = await User.findByPk(followingId);
+      if (!user) {
+        throw "Error: user doesn't exist, failed to create followship";
+      }
+
       const [followship, isNew] = await Followship.findOrCreate({
         where: {
-          followerId: req.user.id,
-          followingId: req.body.followingId,
+          followerId,
+          followingId,
         },
         default: {
-          followerId: req.user.id,
-          followingId: req.body.followingId,
+          followerId,
+          followingId,
         },
       });
 
