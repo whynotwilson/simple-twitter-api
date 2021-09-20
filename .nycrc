@@ -1,0 +1,10 @@
+{
+  "exclude": [
+    "test/models/*.js"
+  ],
+  "reporter": [
+    "text",
+    "html"
+  ],
+  "report-dir": ".nyc_output/coverage"
+}
