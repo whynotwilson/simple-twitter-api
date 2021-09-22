@@ -16,6 +16,9 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
+      tags: {
+        type: DataTypes.STRING,
+      },
     },
     {}
   );
