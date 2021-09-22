@@ -31,6 +31,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "TweetId",
       as: "LikedUsers",
     });
+    Tweet.belongsToMany(models.Tag, {
+      through: models.Tagship,
+      foreignKey: "TweetId",
+      as: "Hashtags",
+    });
   };
   return Tweet;
 };
