@@ -1,8 +1,11 @@
 const db = require("../models");
+const Sequelize = require("sequelize");
 const Tweet = db.Tweet;
 const User = db.User;
 const Reply = db.Reply;
 const Like = db.Like;
+const Tag = db.Tag;
+const Tagship = db.Tagship;
 
 const tweetController = {
   getTweets: async (req, res) => {
@@ -42,24 +45,86 @@ const tweetController = {
   },
 
   postTweet: async (req, res) => {
+    // https://stackoverflow.com/questions/62273766/typeerror-sequelize-transaction-is-not-a-function
+    // https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/662169/
+    let databaseConfig = require("./../config/config.json")[
+      process.env.NODE_ENV
+    ];
+
+    const sequelize = new Sequelize(databaseConfig);
+    const t = await sequelize.transaction();
+
     try {
       const tweetText = req.body.tweetText.trim();
       if (!tweetText) {
         throw "Error: The content of the tweet cannot be blank, failed to create tweet";
       }
-      let tweet = await Tweet.create({
-        UserId: req.user.id,
-        description: tweetText,
-      });
+
+      let { tags } = req.body;
+      tags = [...new Set(tags)];
+
+      let tagsPromises;
+      let tagsResult;
+
+      if (tags.length) {
+        tagsPromises = tags.map((tag) => {
+          return Tag.findOrCreate({
+            where: {
+              text: tag,
+            },
+            transaction: t,
+          });
+        });
+
+        tagsResult = await Promise.all(tagsPromises);
+      }
+
+      let tweet = await Tweet.create(
+        {
+          UserId: req.user.id,
+          description: tweetText,
+        },
+        { transaction: t }
+      );
 
       tweet = tweet.dataValues;
 
-      return res.json({
-        status: "success",
-        message: "create tweet successfully",
-        tweet,
-      });
+      if (tags.length) {
+        let tagShipPromises = tags.map((tag, index) => {
+          return Tagship.create(
+            {
+              TweetId: tweet.id,
+              TagId: tagsResult[index][0].id,
+            },
+            { transaction: t }
+          );
+        });
+
+        let tagShipResults = await Promise.all(tagShipPromises);
+      }
+
+      await t.commit();
+
+      if (tags.length) {
+        const tagsId = tagsResult.map((tag) => {
+          return tag[0].dataValues.id;
+        });
+
+        return res.json({
+          status: "success",
+          message: "create tweet successfully",
+          tweet,
+          tagsId,
+        });
+      } else {
+        return res.json({
+          status: "success",
+          message: "create tweet successfully",
+          tweet,
+        });
+      }
     } catch (err) {
+      await t.rollback();
       console.log(err);
       return res.json({
         status: "error",
