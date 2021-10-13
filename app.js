@@ -1,4 +1,5 @@
 const express = require("express");
+const SocketServer = require("ws").Server;
 
 const methodOverride = require("method-override");
 const cors = require("cors");
@@ -17,7 +18,27 @@ if (process.env.NODE_ENV !== "production") {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+const server = app.listen(port, () => console.log(`Listening on ${port}`));
+
+const wss = new SocketServer({ server });
+let clients = [];
+
+wss.on("connection", (ws, req) => {
+  console.log("Client connected");
+  ws.UserId = req.url.slice(req.url.indexOf("UserId=") + 7);
+
+  clients.push(ws);
+  console.log(clients);
+
+  ws.on("message", (data) => {
+    console.log("receive: " + data);
+    ws.send(data);
+  });
+
+  ws.on("close", () => {
+    console.log("Close connected");
+  });
+});
 
 module.exports = app;
 require("./routes")(app);
