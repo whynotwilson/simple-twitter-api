@@ -43,6 +43,7 @@ module.exports = (app) => {
     userController.putUser
   );
   app.get("/users/:id/tweets", authenticated, userController.getTweets);
+  app.get("/users/:id/friends", authenticated, userController.getFriends);
 
   app.post("/signin", userController.signIn);
   app.post("/signup", userController.signUp);

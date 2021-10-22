@@ -174,6 +174,43 @@ const userController = {
     }
   },
 
+  getFriends: async (req, res) => {
+    try {
+      /**
+        Define friend: follow each other
+      **/
+      let user = await User.scope("withoutPassword").findAll({
+        where: {
+          id: req.user.id,
+        },
+        include: [{ model: User.scope("withoutPassword"), as: "Followings" }],
+      });
+
+      let followings = user[0].dataValues.Followings;
+
+      user = await User.scope("withoutPassword").findAll({
+        where: {
+          id: req.user.id,
+        },
+        include: [{ model: User.scope("withoutPassword"), as: "Followers" }],
+      });
+
+      let followers = user[0].dataValues.Followers;
+
+      let friends = followings.filter((following) => {
+        return followers.map((f) => f.id).indexOf(following.id) !== -1;
+      });
+
+      return res.json(friends);
+    } catch (err) {
+      console.log(err);
+      return res.json({
+        status: "error",
+        message: err.message || err,
+      });
+    }
+  },
+
   getCurrentUser: async (req, res) => {
     try {
       return res.json({
