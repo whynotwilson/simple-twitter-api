@@ -2,6 +2,7 @@ const tweetController = require("../controllers/tweetController");
 const replyController = require("../controllers/replyController");
 const followshipController = require("../controllers/followshipController");
 const userController = require("../controllers/userController");
+const chatController = require("../controllers/chatController");
 
 const multer = require("multer");
 const upload = multer({ dest: "temp/" });
@@ -44,6 +45,12 @@ module.exports = (app) => {
   );
   app.get("/users/:id/tweets", authenticated, userController.getTweets);
   app.get("/users/:id/friends", authenticated, userController.getFriends);
+
+  app.get(
+    "/messages/:chattingUserId",
+    authenticated,
+    chatController.getMessages
+  );
 
   app.post("/signin", userController.signIn);
   app.post("/signup", userController.signUp);
