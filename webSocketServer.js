@@ -25,6 +25,23 @@ const webSocketServer = {
       verifyClient: authenticated,
     });
 
+    wss.broadcastOnlineUsers = function () {
+      const onlineUsersId = Object.values(onlineUsers).map(
+        (user) => user.currentUserId
+      );
+      wss.clients.forEach((client) =>
+        client.send(
+          JSON.stringify({
+            onlineUsersId,
+          })
+        )
+      );
+    };
+
+    wss.deleteOnlineUser = function (id) {
+      delete onlineUsers[id];
+    };
+
     server.on("upgrade", function (request, socket, head) {
       wss.handleUpgrade(request, socket, head, function (ws) {
         wss.emit("connection", ws, request);
@@ -61,6 +78,8 @@ const webSocketServer = {
       console.log("ws.currentUserId: " + ws.currentUserId);
       console.log("ws.chattingUserId: " + ws.chattingUserId);
       console.log("");
+
+      wss.broadcastOnlineUsers();
 
       ws.on("message", async (data) => {
         try {
@@ -116,6 +135,9 @@ const webSocketServer = {
         console.log("ws.currentUserId: " + ws.currentUserId);
         console.log("ws.chattingUserId: " + ws.chattingUserId);
         console.log("");
+
+        wss.deleteOnlineUser(ws.currentUserId);
+        wss.broadcastOnlineUsers();
       });
 
       ws.on("error", (error) => {
