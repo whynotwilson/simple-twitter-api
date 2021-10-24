@@ -83,35 +83,21 @@ const webSocketServer = {
 
       ws.on("message", async (data) => {
         try {
-          // console.log("onMessage: " + data.toString());
-          // console.log({
-          //   from: `user ${ws.currentUserId - 1}`,
-          //   to: `user ${ws.chattingUserId - 1}`,
-          // });
-          // console.log("");
-
           let message = await Message.create({
             senderId: ws.currentUserId,
             receiverId: ws.chattingUserId,
             message: data.toString(),
           });
 
-          let sendingClient = Array.from(wss.clients).filter((client) => {
-            if (
-              client.currentUserId === ws.chattingUserId &&
-              client.chattingUserId === ws.currentUserId
-            ) {
-              return client;
+          Object.entries(onlineUsers).forEach(([key, user]) => {
+            if (user.currentUserId === ws.chattingUserId) {
+              user.send(
+                JSON.stringify({
+                  message: message.dataValues,
+                })
+              );
             }
           });
-
-          if (sendingClient.length) {
-            sendingClient[0].send(
-              JSON.stringify({
-                message: message.dataValues,
-              })
-            );
-          }
 
           ws.send(
             JSON.stringify({
