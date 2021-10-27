@@ -68,6 +68,15 @@ const userController = {
         throw "信箱重複";
       }
 
+      const reg = /^(?=^.{8,30}$)((?=.*[A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z]))^.*$/;
+      if (!reg.test(password)) {
+        throw `密碼強度不足</br>
+        1. 至少有一個數字 </br>
+        2. 至少有一個小寫英文字母 </br>
+        3. 至少有一個大寫英文字母 </br>
+        4. 長度在 8~30 個字母之間`;
+      }
+
       await User.create({
         name,
         email,
