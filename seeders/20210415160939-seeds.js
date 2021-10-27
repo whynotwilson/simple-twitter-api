@@ -10,19 +10,17 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     try {
       const Followships = [];
-      let times = 15;
-      for (let i = 2; i < 13; i++) {
-        for (let j = i + 1; j < i + times; j++) {
+      for (let i = 1; i < 20; i++) {
+        for (let j = 1; j < 20; j++) {
           if (i !== j) {
             Followships.push({
-              followerId: j,
-              followingId: i,
+              followerId: i,
+              followingId: j,
               createdAt: new Date(),
               updatedAt: new Date(),
             });
           }
         }
-        times--;
       }
       queryInterface.bulkInsert("Followships", Followships, {});
 
