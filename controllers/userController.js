@@ -2,6 +2,8 @@ const db = require("../models");
 const User = db.User;
 const Tweet = db.Tweet;
 const Reply = db.Reply;
+const Message = db.Message;
+const Op = require("sequelize").Op;
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const imgur = require("imgur-node-api");
@@ -165,6 +167,72 @@ const userController = {
         ],
       });
       return res.json(tweets);
+    } catch (err) {
+      console.log(err);
+      return res.json({
+        status: "error",
+        message: err.message || err,
+      });
+    }
+  },
+
+  getFriends: async (req, res) => {
+    try {
+      /**
+        Define friend: follow each other
+      **/
+      let user = await User.scope("withoutPassword").findAll({
+        where: {
+          id: req.user.id,
+        },
+        include: [{ model: User.scope("withoutPassword"), as: "Followings" }],
+      });
+
+      let followings = user[0].dataValues.Followings;
+      followings = followings.map((f) => f.dataValues);
+
+      user = await User.scope("withoutPassword").findAll({
+        where: {
+          id: req.user.id,
+        },
+        include: [{ model: User.scope("withoutPassword"), as: "Followers" }],
+      });
+
+      let followers = user[0].dataValues.Followers;
+      followers = followers.map((f) => f.dataValues);
+
+      let friends = followings.filter((following) => {
+        return followers.map((f) => f.id).indexOf(following.id) !== -1;
+      });
+
+      let lastMessageListPromise;
+      let lastMessageList;
+
+      lastMessageListPromise = friends.map((friend) => {
+        return Message.findAll({
+          where: {
+            [Op.or]: [
+              { senderId: req.user.id, receiverId: friend.id },
+              { senderId: friend.id, receiverId: req.user.id },
+            ],
+          },
+          order: [["createdAt", "DESC"]],
+          limit: 1,
+        });
+      });
+
+      lastMessageList = await Promise.all(lastMessageListPromise);
+      lastMessageList = lastMessageList.map((message) =>
+        message.length ? message[0].dataValues : {}
+      );
+
+      for (let i in friends) {
+        friends[i].lastMessage = lastMessageList[i].message
+          ? lastMessageList[i].message
+          : "";
+      }
+
+      return res.json(friends);
     } catch (err) {
       console.log(err);
       return res.json({

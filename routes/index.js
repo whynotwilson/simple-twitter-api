@@ -3,6 +3,7 @@ const replyController = require("../controllers/replyController");
 const followshipController = require("../controllers/followshipController");
 const userController = require("../controllers/userController");
 const hashtagController = require("../controllers/hashtagController");
+const chatController = require("../controllers/chatController");
 
 const multer = require("multer");
 const upload = multer({ dest: "temp/" });
@@ -44,6 +45,13 @@ module.exports = (app) => {
     userController.putUser
   );
   app.get("/users/:id/tweets", authenticated, userController.getTweets);
+  app.get("/users/:id/friends", authenticated, userController.getFriends);
+
+  app.get(
+    "/messages/:chattingUserId",
+    authenticated,
+    chatController.getMessages
+  );
 
   app.get("/hashtag/:hashtag", authenticated, hashtagController.getTweets);
 
