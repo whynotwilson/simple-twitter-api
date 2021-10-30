@@ -47,14 +47,16 @@ const tweetController = {
   postTweet: async (req, res) => {
     // https://stackoverflow.com/questions/62273766/typeerror-sequelize-transaction-is-not-a-function
     // https://codertw.com/%E7%A8%8B%E5%BC%8F%E8%AA%9E%E8%A8%80/662169/
-    let databaseConfig = require("./../config/config.json")[
-      process.env.NODE_ENV
-    ];
 
-    const sequelize = new Sequelize(databaseConfig);
-    const t = await sequelize.transaction();
+    // let databaseConfig = require("./../config/config.json")[
+    //   process.env.NODE_ENV
+    // ];
+
+    // const sequelize = new Sequelize(databaseConfig);
+    // const t = await sequelize.transaction();
 
     try {
+      console.log("postTweet");
       const tweetText = req.body.tweetText.trim();
       if (!tweetText) {
         throw "Error: The content of the tweet cannot be blank, failed to create tweet";
@@ -72,7 +74,7 @@ const tweetController = {
             where: {
               text: tag,
             },
-            transaction: t,
+            // transaction: t,
           });
         });
 
@@ -83,8 +85,8 @@ const tweetController = {
         {
           UserId: req.user.id,
           description: tweetText,
-        },
-        { transaction: t }
+        }
+        // { transaction: t }
       );
 
       tweet = tweet.dataValues;
@@ -95,15 +97,15 @@ const tweetController = {
             {
               TweetId: tweet.id,
               TagId: tagsResult[index][0].id,
-            },
-            { transaction: t }
+            }
+            // { transaction: t }
           );
         });
 
-        let tagShipResults = await Promise.all(tagShipPromises);
+        await Promise.all(tagShipPromises);
       }
 
-      await t.commit();
+      // await t.commit();
 
       if (tags.length) {
         const tagsId = tagsResult.map((tag) => {
