@@ -1,10 +1,12 @@
 const Websocket = require("ws");
+let server = require("http").createServer();
+
 const jwt = require("jsonwebtoken");
 const db = require("./models");
 const Message = db.Message;
 
 const webSocketServer = {
-  listen: (server, port, ws_port) => {
+  listen: (app, port) => {
     let onlineUsers = {};
 
     const authenticated = function (info) {
@@ -19,11 +21,12 @@ const webSocketServer = {
     };
 
     const wss = new Websocket.Server({
-      port: ws_port,
       clientTracking: true,
-      noserver: true,
+      noServer: true,
       verifyClient: authenticated,
     });
+
+    server.on("request", app);
 
     wss.broadcastOnlineUsers = function () {
       const onlineUsersId = Object.values(onlineUsers).map(
