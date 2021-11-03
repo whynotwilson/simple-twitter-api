@@ -81,6 +81,7 @@ const userController = {
         name,
         email,
         password: bcrypt.hashSync(password, bcrypt.genSaltSync(10), null),
+        avatar: "https://i.imgur.com/z6CF5iQ.jpeg", // default avatar
       });
 
       return res.json({
